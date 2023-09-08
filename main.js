@@ -44,16 +44,23 @@ const processor = {
         //     if(i < l/2)
         //         frame.data[i * 4 + 3] = 100
         // }
+        const cuttingY = 400;
+
+        this.pushRow(cuttingY, frame)
+
         for(let y = 1; y <= this.height; y++) {
             for(let x = 1; x <= this.width; x++) {
-                if(y > 500) {
+                if(y > cuttingY) {
                     const i = this.getPixelIndex(x, y)
-                    const copyIdx = this.getPixelIndex(x, 500)
+                    const copyIdx = this.getPixelIndex(x, cuttingY)
+                    const movingIdx = y - cuttingY
 
-                    frame.data[i + 0] = frame.data[copyIdx + 0]
-                    frame.data[i + 1] = frame.data[copyIdx + 1]
-                    frame.data[i + 2] = frame.data[copyIdx + 2]
-                    frame.data[i + 3] = frame.data[copyIdx + 3]
+                    frame.data[i + 0] = this.movingRows[movingIdx]?.[(x - 1) * 4 + 0]
+                    frame.data[i + 1] = this.movingRows[movingIdx]?.[(x - 1) * 4 + 1]
+                    frame.data[i + 2] = this.movingRows[movingIdx]?.[(x - 1) * 4 + 2]
+                    frame.data[i + 3] = this.movingRows[movingIdx]?.[(x - 1) * 4 + 3]
+
+
                 }
             }
         }
@@ -69,7 +76,24 @@ const processor = {
         const lefts = (x - 1) * 4 + 1;
         const index = tops + lefts -1;
         return index
-    }
+    },
+
+    movingRows: [],
+    pushRow(y, frame) {
+        console.warn(this.count++)
+        const firstIndex = this.getPixelIndex(1, y)
+        const lastIndex = firstIndex + this.width * 4 - 1
+        // const row  = this.ctx1.getImageData(0, y, this.width, y)
+        const row = []
+        for(let i = firstIndex; i <= lastIndex; i++) {
+            row.push(frame.data[i])
+        }
+
+        // if(this.movingRows.length > 100) this.movingRows.splice(this.movingRows.length - 1, 1)
+
+        this.movingRows.unshift([...row])
+    },
+    count: 0,
 }
 
     
